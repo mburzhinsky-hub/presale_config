@@ -1,0 +1,1909 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"
+  />
+  <title>VIZHU — Пресейл конфигуратор</title>
+
+  <style>
+    :root {
+      --bg: #040706;
+      --panel: #09100d;
+      --panel-2: #0d1512;
+      --panel-3: #101a15;
+      --line: rgba(88, 255, 156, 0.15);
+      --line-strong: rgba(88, 255, 156, 0.32);
+      --text: #f2fff7;
+      --muted: rgba(214, 255, 228, 0.68);
+      --muted-2: rgba(214, 255, 228, 0.44);
+      --green: #59ff9c;
+      --green-2: #2cff7c;
+      --green-soft: rgba(89, 255, 156, 0.1);
+      --green-soft-2: rgba(89, 255, 156, 0.18);
+      --danger: #ff8d8d;
+      --warning: #ffd86a;
+      --ok: #bdfcce;
+      --shadow:
+        0 0 0 1px rgba(89, 255, 156, 0.06),
+        0 20px 60px rgba(0, 0, 0, 0.45),
+        0 0 40px rgba(44, 255, 124, 0.06);
+      --radius: 20px;
+      --radius-sm: 14px;
+      --max: 1560px;
+      --font: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background:
+        radial-gradient(circle at top right, rgba(44,255,124,0.08), transparent 24%),
+        radial-gradient(circle at top left, rgba(44,255,124,0.05), transparent 20%),
+        linear-gradient(180deg, #030504 0%, #050907 100%);
+      color: var(--text);
+      font-family: var(--font);
+    }
+
+    body { min-height: 100vh; }
+
+    .app {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 22px;
+    }
+
+    .shell {
+      display: grid;
+      grid-template-columns: 300px minmax(0, 1fr) 360px;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .panel {
+      background: linear-gradient(180deg, rgba(16,26,21,0.96), rgba(8,12,10,0.96));
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+    }
+
+    .sidebar,
+    .summary {
+      position: sticky;
+      top: 22px;
+    }
+
+    .brand {
+      padding: 18px 18px 10px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brand-top {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .logo {
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      background:
+        radial-gradient(circle at 50% 30%, rgba(44,255,124,0.95), rgba(44,255,124,0.28) 45%, rgba(44,255,124,0.08) 75%, transparent 76%),
+        #09110c;
+      border: 1px solid var(--line-strong);
+      box-shadow:
+        inset 0 0 18px rgba(44,255,124,0.16),
+        0 0 22px rgba(44,255,124,0.1);
+      flex: 0 0 46px;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.1;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .brand p {
+      margin: 0;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .menu {
+      padding: 12px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .menu button {
+      appearance: none;
+      width: 100%;
+      text-align: left;
+      border: 1px solid transparent;
+      background: rgba(255,255,255,0.02);
+      color: var(--text);
+      border-radius: 16px;
+      padding: 14px;
+      cursor: pointer;
+      transition: 180ms ease;
+    }
+
+    .menu button:hover,
+    .menu button.active {
+      border-color: var(--line-strong);
+      background: linear-gradient(180deg, rgba(89,255,156,0.12), rgba(89,255,156,0.05));
+      box-shadow: inset 0 0 0 1px rgba(89,255,156,0.05), 0 0 20px rgba(44,255,124,0.05);
+    }
+
+    .menu .title {
+      display: block;
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 3px;
+    }
+
+    .menu .sub {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .center {
+      display: grid;
+      gap: 18px;
+    }
+
+    .hero {
+      padding: 22px;
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: flex-start;
+    }
+
+    .hero h2 {
+      margin: 0 0 8px;
+      font-size: 30px;
+      line-height: 1.04;
+      letter-spacing: -0.03em;
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 760px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .badge {
+      padding: 9px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.025);
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .hero-actions {
+      display: grid;
+      gap: 10px;
+      min-width: 240px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 16px;
+    }
+
+    .card {
+      padding: 18px;
+      grid-column: span 12;
+    }
+
+    .card h3 {
+      margin: 0 0 14px;
+      font-size: 18px;
+      letter-spacing: -0.02em;
+    }
+
+    .card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .field-grid.three {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      appearance: none;
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0.015));
+      color: var(--text);
+      border-radius: 14px;
+      padding: 13px 14px;
+      outline: none;
+      font: inherit;
+      transition: 160ms ease;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--line-strong);
+      box-shadow: 0 0 0 4px rgba(44,255,124,0.08), 0 0 24px rgba(44,255,124,0.08);
+    }
+
+    textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    .btn {
+      appearance: none;
+      border: 1px solid var(--line-strong);
+      border-radius: 16px;
+      padding: 13px 16px;
+      background: linear-gradient(180deg, rgba(89,255,156,0.16), rgba(89,255,156,0.08));
+      color: var(--text);
+      font: inherit;
+      cursor: pointer;
+      transition: 160ms ease;
+      min-height: 48px;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 0 24px rgba(44,255,124,0.1);
+    }
+
+    .btn.secondary {
+      background: rgba(255,255,255,0.02);
+      border-color: var(--line);
+      color: var(--muted);
+    }
+
+    .btn.ghost {
+      background: transparent;
+      border-color: var(--line);
+      color: var(--muted);
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .toggle-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .toggle-card {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 16px;
+      background: rgba(255,255,255,0.02);
+      cursor: pointer;
+      transition: 160ms ease;
+    }
+
+    .toggle-card.active {
+      border-color: var(--line-strong);
+      background: linear-gradient(180deg, rgba(89,255,156,0.12), rgba(89,255,156,0.04));
+      box-shadow: 0 0 20px rgba(44,255,124,0.06);
+    }
+
+    .toggle-card strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 15px;
+    }
+
+    .toggle-card span {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .module-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .module {
+      padding: 16px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.02);
+      display: grid;
+      gap: 14px;
+    }
+
+    .module-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .module-title {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .module-title strong {
+      font-size: 16px;
+    }
+
+    .module-title span {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .module-body {
+      display: none;
+      gap: 12px;
+    }
+
+    .module.active .module-body {
+      display: grid;
+    }
+
+    .module-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .module-actions .btn {
+      min-height: 42px;
+      padding: 10px 12px;
+      border-radius: 12px;
+    }
+
+    .spec-wrap {
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 980px;
+      font-size: 13px;
+    }
+
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid rgba(89,255,156,0.09);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      background: #0d1511;
+      color: var(--muted);
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.04em;
+      z-index: 1;
+    }
+
+    tr:hover td {
+      background: rgba(89,255,156,0.03);
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 9px;
+      border-radius: 999px;
+      font-size: 11px;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .tag.required {
+      color: #d6ffe4;
+      background: rgba(89,255,156,0.08);
+    }
+
+    .tag.auto {
+      color: #d0ffe3;
+      background: rgba(44,255,124,0.07);
+    }
+
+    .tag.optional {
+      color: #ffe8aa;
+      background: rgba(255,216,106,0.08);
+    }
+
+    .tag.manual {
+      color: #fff;
+      background: rgba(255,255,255,0.06);
+    }
+
+    .summary {
+      padding: 16px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .summary-card {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 16px;
+      background: rgba(255,255,255,0.02);
+    }
+
+    .summary-card h4 {
+      margin: 0 0 12px;
+      font-size: 14px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .metric {
+      display: grid;
+      gap: 4px;
+      margin-bottom: 12px;
+    }
+
+    .metric:last-child { margin-bottom: 0; }
+
+    .metric strong {
+      font-size: 28px;
+      letter-spacing: -0.03em;
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .mini-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .mini {
+      padding: 12px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.02);
+    }
+
+    .mini b {
+      display: block;
+      font-size: 18px;
+      margin-bottom: 3px;
+    }
+
+    .mini span {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .risk-list,
+    .scope-list {
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .risk-list li,
+    .scope-list li {
+      padding: 12px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.02);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .risk-list li.warn {
+      border-color: rgba(255,216,106,0.25);
+      color: #ffe7a0;
+    }
+
+    .risk-list li.err {
+      border-color: rgba(255,141,141,0.25);
+      color: #ffc4c4;
+    }
+
+    .risk-list li.ok {
+      border-color: rgba(89,255,156,0.22);
+      color: #d5ffe3;
+    }
+
+    .footer-note {
+      color: var(--muted-2);
+      font-size: 12px;
+      line-height: 1.5;
+      padding-top: 4px;
+    }
+
+    @media (max-width: 1320px) {
+      .shell {
+        grid-template-columns: 1fr;
+      }
+      .sidebar,
+      .summary {
+        position: static;
+      }
+      .toggle-grid,
+      .field-grid.three {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 780px) {
+      .app { padding: 12px; }
+      .hero {
+        padding: 18px;
+        flex-direction: column;
+      }
+      .field-grid,
+      .field-grid.three,
+      .toggle-grid,
+      .mini-grid {
+        grid-template-columns: 1fr;
+      }
+      .hero h2 { font-size: 24px; }
+      .card { padding: 16px; }
+      .menu {
+        grid-template-columns: 1fr 1fr;
+        display: grid;
+      }
+      .brand { padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="shell">
+      <aside class="panel sidebar">
+        <div class="brand">
+          <div class="brand-top">
+            <div class="logo"></div>
+            <div>
+              <h1>VIZHU CPQ</h1>
+              <p>Пресейл-конфигуратор ИТО</p>
+            </div>
+          </div>
+          <p>
+            Быстрый расчёт оборудования, зависимостей, резервов, спецификации и выгрузки в Excel.
+          </p>
+        </div>
+        <nav class="menu" id="menu"></nav>
+      </aside>
+
+      <main class="center">
+        <section class="panel hero">
+          <div>
+            <h2>Конфигуратор просчёта под стиль VIZHU</h2>
+            <p>
+              Назови проект, выбери тип объекта, включи нужные системы и получи автоматический состав
+              спецификации. Зависимые позиции добавляются сами: контроллеры, кабели, крепёж, резерв,
+              шкафы, монтаж и ПНР.
+            </p>
+            <div class="badge-row">
+              <div class="badge">Фирменный стиль: зелёный / чёрный неон</div>
+              <div class="badge">Excel выгрузка по всему просчёту</div>
+              <div class="badge">Автосохранение черновика</div>
+              <div class="badge">MVP без сервера</div>
+            </div>
+          </div>
+          <div class="hero-actions">
+            <button class="btn" id="recalcTop">Пересчитать проект</button>
+            <button class="btn secondary" id="saveDraftTop">Сохранить черновик</button>
+            <button class="btn ghost" id="exportTop">Выгрузить Excel</button>
+          </div>
+        </section>
+
+        <section class="grid">
+          <section class="panel card" data-step="project">
+            <div class="card-head">
+              <div>
+                <h3>1. Карточка проекта</h3>
+                <div class="muted">
+                  Обязательный блок. Имя проекта используется в заголовке расчёта и в имени Excel-файла.
+                </div>
+              </div>
+            </div>
+            <div class="field-grid">
+              <div class="field full">
+                <label for="projectName">Название проекта</label>
+                <input id="projectName" type="text" placeholder="Например: Бахрушин — Детский центр / пресейл LED + AV" />
+              </div>
+              <div class="field">
+                <label for="clientName">Заказчик</label>
+                <input id="clientName" type="text" placeholder="ООО / музей / девелопер" />
+              </div>
+              <div class="field">
+                <label for="ownerName">Ответственный</label>
+                <input id="ownerName" type="text" placeholder="ФИО / отдел" />
+              </div>
+              <div class="field">
+                <label for="projectType">Тип объекта</label>
+                <select id="projectType">
+                  <option value="museum">Музей / культурный объект</option>
+                  <option value="office">Офис / штаб / диспетчерская</option>
+                  <option value="exhibition">Выставка / pop-up / event</option>
+                  <option value="retail">Ритейл / входная группа</option>
+                  <option value="conference">Конференц-зал / переговорная</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="region">Регион</label>
+                <select id="region">
+                  <option value="moscow">Москва / МО</option>
+                  <option value="russia">РФ, регион</option>
+                  <option value="cis">СНГ</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="level">Класс решения</label>
+                <select id="level">
+                  <option value="base">Базовый</option>
+                  <option value="standard" selected>Стандарт</option>
+                  <option value="premium">Премиум</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="calcMode">Точность расчёта</label>
+                <select id="calcMode">
+                  <option value="express">Экспресс</option>
+                  <option value="standard" selected>Стандарт</option>
+                  <option value="detailed">Детальный</option>
+                </select>
+              </div>
+              <div class="field full">
+                <label for="projectComment">Комментарий / допущения</label>
+                <textarea id="projectComment" placeholder="Кратко опиши концепцию, ограничения по бюджету, нюансы площадки и всё, что важно для пресейла."></textarea>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel card" data-step="geometry">
+            <div class="card-head">
+              <div>
+                <h3>2. Параметры объекта</h3>
+                <div class="muted">
+                  Эти параметры влияют на количество оборудования, коэффициенты сложности, монтаж и ПНР.
+                </div>
+              </div>
+            </div>
+            <div class="field-grid three">
+              <div class="field">
+                <label for="area">Площадь объекта, м²</label>
+                <input id="area" type="number" min="0" step="1" value="300" />
+              </div>
+              <div class="field">
+                <label for="zones">Количество зон</label>
+                <input id="zones" type="number" min="1" step="1" value="3" />
+              </div>
+              <div class="field">
+                <label for="ceiling">Высота потолка, м</label>
+                <input id="ceiling" type="number" min="2" step="0.1" value="4.2" />
+              </div>
+              <div class="field">
+                <label for="mountComplexity">Сложность монтажа</label>
+                <select id="mountComplexity">
+                  <option value="normal">Типовая</option>
+                  <option value="hard">Сложная</option>
+                  <option value="veryhard">Очень сложная</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="infrastructure">Исходная инфраструктура</label>
+                <select id="infrastructure">
+                  <option value="none">Практически отсутствует</option>
+                  <option value="partial" selected>Частично есть</option>
+                  <option value="ready">В целом готова</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="budget">Ожидаемый бюджет, ₽</label>
+                <input id="budget" type="number" min="0" step="10000" value="12000000" />
+              </div>
+            </div>
+          </section>
+
+          <section class="panel card" data-step="systems">
+            <div class="card-head">
+              <div>
+                <h3>3. Выбор систем</h3>
+                <div class="muted">
+                  Выбранные системы будут автоматически развернуты в инженерные модули и строки спецификации.
+                </div>
+              </div>
+            </div>
+            <div class="toggle-grid" id="systemToggles"></div>
+          </section>
+
+          <section class="panel card" data-step="modules">
+            <div class="card-head">
+              <div>
+                <h3>4. Конфигурация модулей</h3>
+                <div class="muted">
+                  Открой нужный модуль, измени ключевые параметры и нажми пересчёт. Часть позиций подтягивается автоматически.
+                </div>
+              </div>
+              <div class="actions">
+                <button class="btn secondary" id="expandAll">Открыть все</button>
+                <button class="btn ghost" id="collapseAll">Свернуть все</button>
+              </div>
+            </div>
+            <div class="module-list" id="moduleList"></div>
+          </section>
+
+          <section class="panel card" data-step="spec">
+            <div class="card-head">
+              <div>
+                <h3>5. Спецификация проекта</h3>
+                <div class="muted">
+                  Финальная таблица просчёта. Она экспортируется в Excel вместе с карточкой проекта, итогами, допущениями и рисками.
+                </div>
+              </div>
+              <div class="actions">
+                <button class="btn" id="exportSpec">Выгрузить Excel</button>
+              </div>
+            </div>
+            <div class="spec-wrap">
+              <table id="specTable">
+                <thead>
+                  <tr>
+                    <th>Раздел</th>
+                    <th>Код</th>
+                    <th>Наименование</th>
+                    <th>Кол-во</th>
+                    <th>Ед.</th>
+                    <th>Закупка</th>
+                    <th>Продажа</th>
+                    <th>Тип</th>
+                    <th>Основание</th>
+                  </tr>
+                </thead>
+                <tbody id="specBody"></tbody>
+              </table>
+            </div>
+          </section>
+        </section>
+      </main>
+
+      <aside class="panel summary">
+        <div class="summary-card">
+          <h4>Сводка проекта</h4>
+          <div class="metric">
+            <strong id="summaryProjectName">Без названия</strong>
+            <span id="summaryMeta">Черновик пресейла</span>
+          </div>
+          <div class="mini-grid">
+            <div class="mini"><b id="summaryPurchase">0 ₽</b><span>Себестоимость</span></div>
+            <div class="mini"><b id="summarySale">0 ₽</b><span>Продажа</span></div>
+            <div class="mini"><b id="summaryMargin">0 ₽</b><span>Валовая маржа</span></div>
+            <div class="mini"><b id="summaryMarginPct">0%</b><span>Маржинальность</span></div>
+          </div>
+        </div>
+
+        <div class="summary-card">
+          <h4>Контроль состава</h4>
+          <div class="mini-grid">
+            <div class="mini"><b id="summaryItems">0</b><span>Строк в спецификации</span></div>
+            <div class="mini"><b id="summaryModules">0</b><span>Активных модулей</span></div>
+            <div class="mini"><b id="summaryAuto">0</b><span>Автодобавлено</span></div>
+            <div class="mini"><b id="summaryRequired">0</b><span>Обязательных</span></div>
+          </div>
+        </div>
+
+        <div class="summary-card">
+          <h4>Риски и флаги</h4>
+          <ul class="risk-list" id="riskList"></ul>
+        </div>
+
+        <div class="summary-card">
+          <h4>Что включено / не включено</h4>
+          <ul class="scope-list" id="scopeList"></ul>
+        </div>
+
+        <div class="summary-card">
+          <h4>Действия</h4>
+          <div class="actions">
+            <button class="btn" id="recalcSide">Пересчитать</button>
+            <button class="btn secondary" id="saveDraftSide">Сохранить</button>
+            <button class="btn ghost" id="loadDraft">Загрузить</button>
+            <button class="btn ghost" id="clearDraft">Очистить</button>
+          </div>
+          <div class="footer-note">
+            Экспорт в Excel выполняется прямо из браузера. Для MVP данные сохраняются локально на этом устройстве через localStorage.
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    const systemDefinitions = [
+      {
+        id: "led",
+        title: "LED / видеостены",
+        description: "Экраны, контроллеры, кабели, запас модулей, металлоконструкции.",
+        enabled: true,
+        fields: [
+          { key: "screenArea", label: "Площадь экрана, м²", type: "number", min: 1, step: 0.1, value: 18 },
+          { key: "pixelPitch", label: "Шаг пикселя", type: "select", value: "P2.6", options: ["P1.9", "P2.6", "P3.9"] },
+          { key: "environment", label: "Исполнение", type: "select", value: "indoor", options: ["indoor", "outdoor"] },
+          { key: "reservePercent", label: "Резерв, %", type: "number", min: 0, step: 1, value: 5 },
+          { key: "mountType", label: "Тип монтажа", type: "select", value: "wall", options: ["wall", "truss", "custom"] }
+        ]
+      },
+      {
+        id: "audio",
+        title: "Аудиосистема",
+        description: "Акустика, усиление, DSP, кабели, коммутация, стойки.",
+        enabled: true,
+        fields: [
+          { key: "speakerZones", label: "Зон озвучивания", type: "number", min: 1, step: 1, value: 3 },
+          { key: "coverage", label: "Уровень покрытия", type: "select", value: "standard", options: ["basic", "standard", "extended"] },
+          { key: "subwoofers", label: "Нужны сабвуферы", type: "select", value: "yes", options: ["yes", "no"] }
+        ]
+      },
+      {
+        id: "control",
+        title: "Управление / AV-over-IP",
+        description: "Система управления, сенсорные панели, коммутация, программирование.",
+        enabled: true,
+        fields: [
+          { key: "rooms", label: "Управляемых зон", type: "number", min: 1, step: 1, value: 3 },
+          { key: "uiPanels", label: "Сенсорных панелей", type: "number", min: 1, step: 1, value: 2 },
+          { key: "ipMode", label: "Архитектура", type: "select", value: "hybrid", options: ["basic", "hybrid", "full-ip"] }
+        ]
+      },
+      {
+        id: "network",
+        title: "Сети / шкафы",
+        description: "Коммутаторы, шкафы, патч-панели, UPS, патчкорды.",
+        enabled: false,
+        fields: [
+          { key: "switchCount", label: "Коммутаторов", type: "number", min: 1, step: 1, value: 2 },
+          { key: "rackUnits", label: "Размер шкафа, U", type: "number", min: 6, step: 1, value: 18 },
+          { key: "ups", label: "UPS нужен", type: "select", value: "yes", options: ["yes", "no"] }
+        ]
+      },
+      {
+        id: "interactive",
+        title: "Интерактив / touch",
+        description: "Интерактивные панели, медиаплееры, стойки, крепления.",
+        enabled: false,
+        fields: [
+          { key: "touchPoints", label: "Точек интерактива", type: "number", min: 1, step: 1, value: 2 },
+          { key: "size", label: "Диагональ", type: "select", value: "55", options: ["43", "55", "65", "75"] },
+          { key: "kiosk", label: "Тип", type: "select", value: "wall", options: ["wall", "kiosk"] }
+        ]
+      },
+      {
+        id: "power",
+        title: "Электрика / ПНР",
+        description: "Щиты, автоматы, монтажные материалы, пусконаладка, запас.",
+        enabled: true,
+        fields: [
+          { key: "pnrDays", label: "Дней ПНР", type: "number", min: 1, step: 1, value: 4 },
+          { key: "electricKits", label: "Комплектов электрики", type: "number", min: 1, step: 1, value: 2 },
+          { key: "sparePower", label: "Резерв питания, %", type: "number", min: 0, step: 1, value: 10 }
+        ]
+      }
+    ];
+
+    const state = {
+      project: {
+        projectName: "",
+        clientName: "",
+        ownerName: "",
+        projectType: "museum",
+        region: "moscow",
+        level: "standard",
+        calcMode: "standard",
+        projectComment: "",
+        area: 300,
+        zones: 3,
+        ceiling: 4.2,
+        mountComplexity: "normal",
+        infrastructure: "partial",
+        budget: 12000000
+      },
+      systems: JSON.parse(JSON.stringify(systemDefinitions)),
+      spec: [],
+      risks: [],
+      scope: []
+    };
+
+    const menuItems = [
+      { id: "project", title: "Карточка проекта", sub: "Название, заказчик, стадия" },
+      { id: "geometry", title: "Параметры объекта", sub: "Площадь, зоны, монтаж" },
+      { id: "systems", title: "Системы", sub: "Выбор разделов проекта" },
+      { id: "modules", title: "Модули", sub: "Настройка инженерных блоков" },
+      { id: "spec", title: "Спецификация", sub: "Таблица просчёта и Excel" }
+    ];
+
+    const STORAGE_KEY = "vizhu-presale-configurator-v1";
+
+    const rub = (value) =>
+      new Intl.NumberFormat("ru-RU", {
+        style: "currency",
+        currency: "RUB",
+        maximumFractionDigits: 0
+      }).format(value || 0);
+
+    const plainNumber = (value) =>
+      new Intl.NumberFormat("ru-RU", {
+        maximumFractionDigits: 2
+      }).format(value || 0);
+
+    const num = (value) => Number(value || 0);
+    const ceil = (value, step = 1) => Math.ceil(value / step) * step;
+
+    function optionLabel(value) {
+      const map = {
+        indoor: "Indoor",
+        outdoor: "Outdoor",
+        wall: "Настенный",
+        truss: "На ферме",
+        custom: "Нестандартный",
+        basic: "Базовый",
+        hybrid: "Гибридный",
+        "full-ip": "Полный IP",
+        yes: "Да",
+        no: "Нет",
+        standard: "Стандарт",
+        extended: "Расширенный"
+      };
+      return map[value] || value;
+    }
+
+    function formatQty(value) {
+      return Number.isInteger(value) ? String(value) : String(value).replace(".", ",");
+    }
+
+    function typeTag(type) {
+      const names = {
+        required: "Обязательное",
+        auto: "Авто",
+        optional: "Опционально",
+        manual: "Вручную"
+      };
+      return `<span class="tag ${type}">${names[type] || type}</span>`;
+    }
+
+    function sanitizeFileName(name) {
+      const safe = (name || "vizhu-presale-calc")
+        .replace(/[\\/:*?"<>|]+/g, "_")
+        .replace(/\s+/g, " ")
+        .trim();
+      return safe || "vizhu-presale-calc";
+    }
+
+    function renderMenu() {
+      const menu = document.getElementById("menu");
+      menu.innerHTML = menuItems
+        .map((item, index) => `
+          <button data-target="${item.id}" class="${index === 0 ? "active" : ""}">
+            <span class="title">${index + 1}. ${item.title}</span>
+            <span class="sub">${item.sub}</span>
+          </button>
+        `)
+        .join("");
+
+      menu.querySelectorAll("button").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          menu.querySelectorAll("button").forEach((x) => x.classList.remove("active"));
+          btn.classList.add("active");
+          const target = document.querySelector(`[data-step="${btn.dataset.target}"]`);
+          if (target) {
+            target.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+        });
+      });
+    }
+
+    function bindProjectFields() {
+      const ids = [
+        "projectName", "clientName", "ownerName", "projectType", "region", "level",
+        "calcMode", "projectComment", "area", "zones", "ceiling",
+        "mountComplexity", "infrastructure", "budget"
+      ];
+
+      ids.forEach((id) => {
+        const el = document.getElementById(id);
+        const handler = () => {
+          state.project[id] = el.type === "number" ? num(el.value) : el.value;
+          renderSummaryHeader();
+          calculate();
+        };
+        el.addEventListener("input", handler);
+        el.addEventListener("change", handler);
+      });
+    }
+
+    function renderSystemToggles() {
+      const wrap = document.getElementById("systemToggles");
+      wrap.innerHTML = state.systems
+        .map(
+          (sys) => `
+          <div class="toggle-card ${sys.enabled ? "active" : ""}" data-system="${sys.id}">
+            <strong>${sys.title}</strong>
+            <span>${sys.description}</span>
+          </div>
+        `
+        )
+        .join("");
+
+      wrap.querySelectorAll(".toggle-card").forEach((card) => {
+        card.addEventListener("click", () => {
+          const system = state.systems.find((s) => s.id === card.dataset.system);
+          system.enabled = !system.enabled;
+          renderSystemToggles();
+          renderModules();
+          calculate();
+        });
+      });
+    }
+
+    function renderModules() {
+      const list = document.getElementById("moduleList");
+      list.innerHTML = state.systems
+        .map((sys) => {
+          const fieldsHtml = sys.fields
+            .map((field) => {
+              if (field.type === "select") {
+                return `
+                  <div class="field">
+                    <label>${field.label}</label>
+                    <select data-system="${sys.id}" data-key="${field.key}">
+                      ${field.options
+                        .map(
+                          (opt) => `
+                        <option value="${opt}" ${String(field.value) === String(opt) ? "selected" : ""}>
+                          ${optionLabel(opt)}
+                        </option>
+                      `
+                        )
+                        .join("")}
+                    </select>
+                  </div>
+                `;
+              }
+
+              return `
+                <div class="field">
+                  <label>${field.label}</label>
+                  <input
+                    data-system="${sys.id}"
+                    data-key="${field.key}"
+                    type="number"
+                    min="${field.min ?? 0}"
+                    step="${field.step ?? 1}"
+                    value="${field.value}"
+                  />
+                </div>
+              `;
+            })
+            .join("");
+
+          return `
+            <div class="module ${sys.enabled ? "active" : ""}" data-module="${sys.id}">
+              <div class="module-head">
+                <div class="module-title">
+                  <strong>${sys.title}</strong>
+                  <span>${sys.description}</span>
+                </div>
+                <div class="module-actions">
+                  <button class="btn secondary toggle-module" data-id="${sys.id}">
+                    ${sys.enabled ? "Свернуть" : "Открыть"}
+                  </button>
+                  <button class="btn ghost toggle-enable" data-id="${sys.id}">
+                    ${sys.enabled ? "Выключить" : "Включить"}
+                  </button>
+                </div>
+              </div>
+              <div class="module-body">
+                <div class="field-grid three">${fieldsHtml}</div>
+              </div>
+            </div>
+          `;
+        })
+        .join("");
+
+      list.querySelectorAll(".toggle-module").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const module = document.querySelector(`.module[data-module="${btn.dataset.id}"]`);
+          module.classList.toggle("active");
+          btn.textContent = module.classList.contains("active") ? "Свернуть" : "Открыть";
+        });
+      });
+
+      list.querySelectorAll(".toggle-enable").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const system = state.systems.find((s) => s.id === btn.dataset.id);
+          system.enabled = !system.enabled;
+          renderSystemToggles();
+          renderModules();
+          calculate();
+        });
+      });
+
+      list.querySelectorAll("input[data-system], select[data-system]").forEach((el) => {
+        el.addEventListener("input", handleModuleField);
+        el.addEventListener("change", handleModuleField);
+      });
+    }
+
+    function handleModuleField(e) {
+      const { system: systemId, key } = e.target.dataset;
+      const system = state.systems.find((s) => s.id === systemId);
+      const field = system.fields.find((f) => f.key === key);
+      field.value = e.target.type === "number" ? num(e.target.value) : e.target.value;
+      calculate();
+    }
+
+    function getField(systemId, key) {
+      return state.systems.find((s) => s.id === systemId)?.fields.find((f) => f.key === key)?.value;
+    }
+
+    function buildSpec() {
+      const p = state.project;
+
+      const levelMultiplier = { base: 1, standard: 1.18, premium: 1.38 }[p.level] || 1.18;
+      const regionMultiplier = { moscow: 1, russia: 1.06, cis: 1.12 }[p.region] || 1;
+      const complexityMultiplier = { normal: 1, hard: 1.12, veryhard: 1.24 }[p.mountComplexity] || 1;
+      const infrastructureMultiplier = { ready: 0.94, partial: 1, none: 1.1 }[p.infrastructure] || 1;
+      const calcModeReserve = { express: 1.08, standard: 1.12, detailed: 1.15 }[p.calcMode] || 1.12;
+
+      const spec = [];
+
+      const push = (row) =>
+        spec.push({
+          section: row.section,
+          code: row.code,
+          name: row.name,
+          qty: Number((row.qty ?? 0).toFixed ? row.qty.toFixed(2) : row.qty),
+          unit: row.unit || "шт",
+          purchase: Math.round(row.purchase || 0),
+          sale: Math.round(row.sale || 0),
+          type: row.type || "required",
+          reason: row.reason || ""
+        });
+
+      if (state.systems.find((s) => s.id === "led")?.enabled) {
+        const area = num(getField("led", "screenArea"));
+        const pitch = getField("led", "pixelPitch");
+        const reserve = num(getField("led", "reservePercent")) / 100;
+        const environment = getField("led", "environment");
+        const mount = getField("led", "mountType");
+
+        const cabinetArea = pitch === "P1.9" ? 0.144 : pitch === "P2.6" ? 0.16 : 0.25;
+        const cabinetCount = Math.max(4, ceil(area / cabinetArea));
+        const cabinetBase = pitch === "P1.9" ? 98000 : pitch === "P2.6" ? 76000 : 62000;
+        const envMul = environment === "outdoor" ? 1.28 : 1;
+        const mountMul = mount === "custom" ? 1.18 : mount === "truss" ? 1.1 : 1;
+
+        push({
+          section: "LED",
+          code: "LED-CAB",
+          name: `LED кабинет ${pitch.toUpperCase()} ${optionLabel(environment)}`,
+          qty: cabinetCount,
+          purchase: cabinetCount * cabinetBase * envMul,
+          sale: cabinetCount * cabinetBase * envMul * levelMultiplier * regionMultiplier,
+          type: "required",
+          reason: `Основной экран ${area} м²`
+        });
+
+        push({
+          section: "LED",
+          code: "LED-SPARE",
+          name: "Резервные LED модули",
+          qty: Math.max(1, Math.ceil(cabinetCount * reserve)),
+          purchase: cabinetCount * reserve * (cabinetBase * 0.32),
+          sale: cabinetCount * reserve * (cabinetBase * 0.32) * levelMultiplier * regionMultiplier,
+          type: "auto",
+          reason: `Резерв ${Math.round(reserve * 100)}%`
+        });
+
+        push({
+          section: "LED",
+          code: "LED-CTRL",
+          name: "Видеоконтроллер",
+          qty: area > 25 ? 2 : 1,
+          purchase: (area > 25 ? 2 : 1) * (pitch === "P1.9" ? 320000 : 240000),
+          sale: (area > 25 ? 2 : 1) * (pitch === "P1.9" ? 320000 : 240000) * levelMultiplier * regionMultiplier,
+          type: "auto",
+          reason: "Автоподбор по площади и шагу пикселя"
+        });
+
+        push({
+          section: "LED",
+          code: "LED-PSU",
+          name: "Комплект питания и коммутации LED",
+          qty: Math.max(1, Math.ceil(cabinetCount / 8)),
+          purchase: Math.max(1, Math.ceil(cabinetCount / 8)) * 38000,
+          sale: Math.max(1, Math.ceil(cabinetCount / 8)) * 38000 * levelMultiplier * regionMultiplier,
+          type: "auto",
+          reason: "Автоматическая зависимость для экрана"
+        });
+
+        push({
+          section: "LED",
+          code: "LED-METAL",
+          name: `Металлоконструкция ${optionLabel(mount)}`,
+          qty: 1,
+          purchase: area * 42000 * mountMul * complexityMultiplier,
+          sale: area * 42000 * mountMul * complexityMultiplier * levelMultiplier * regionMultiplier,
+          type: "required",
+          reason: "По типу монтажа"
+        });
+      }
+
+      if (state.systems.find((s) => s.id === "audio")?.enabled) {
+        const zones = num(getField("audio", "speakerZones"));
+        const coverage = getField("audio", "coverage");
+        const subs = getField("audio", "subwoofers") === "yes";
+        const factor = coverage === "extended" ? 1.35 : coverage === "basic" ? 0.85 : 1;
+        const speakerCount = Math.max(2, ceil((p.area / 55) * factor));
+
+        push({
+          section: "Audio",
+          code: "AUD-SPK",
+          name: `Акустические системы, ${zones} зон`,
+          qty: speakerCount,
+          purchase: speakerCount * 58000,
+          sale: speakerCount * 58000 * levelMultiplier * regionMultiplier,
+          type: "required",
+          reason: "Расчёт по площади и покрытию"
+        });
+
+        push({
+          section: "Audio",
+          code: "AUD-AMP",
+          name: "Усилители / DSP",
+          qty: Math.max(1, Math.ceil(speakerCount / 4)),
+          purchase: Math.max(1, Math.ceil(speakerCount / 4)) * 142000,
+          sale: Math.max(1, Math.ceil(speakerCount / 4)) * 142000 * levelMultiplier * regionMultiplier,
+          type: "auto",
+          reason: "Автодобавлено под количество акустики"
+        });
+
+        if (subs) {
+          push({
+            section: "Audio",
+            code: "AUD-SUB",
+            name: "Сабвуферы",
+            qty: Math.max(1, Math.ceil(zones / 2)),
+            purchase: Math.max(1, Math.ceil(zones / 2)) * 118000,
+            sale: Math.max(1, Math.ceil(zones / 2)) * 118000 * levelMultiplier * regionMultiplier,
+            type: "optional",
+            reason: "Включено по выбранной конфигурации"
+          });
+        }
+
+        push({
+          section: "Audio",
+          code: "AUD-CBL",
+          name: "Акустическая кабельная обвязка",
+          qty: speakerCount * 20,
+          unit: "м",
+          purchase: speakerCount * 20 * 280,
+          sale: speakerCount * 20 * 280 * levelMultiplier * regionMultiplier,
+          type: "auto",
+          reason: "Типовой расход кабеля"
+        });
+      }
+
+      if (state.systems.find((s) => s.id === "control")?.enabled) {
+        const rooms = num(getField("control", "rooms"));
+        const panels = num(getField("control", "uiPanels"));
+        const mode = getField("control", "ipMode");
+        const modeFactor = mode === "full-ip" ? 1.35 : mode === "basic" ? 0.8 : 1;
+
+        push({
+          section: "Control",
+          code: "CTL-CPU",
+          name: `Контроллер системы управления (${optionLabel(mode)})`,
+          qty: Math.max(1, Math.ceil(rooms / 3)),
+          purchase: Math.max(1, Math.ceil(rooms / 3)) * 265000 * modeFactor,
+          sale: Math.max(1, Math.ceil(rooms / 3)) * 265000 * modeFactor * levelMultiplier * regionMultiplier,
+          type: "required",
+          reason: "По числу управляемых зон"
+        });
+
+        push({
+          section: "Control",
+          code: "CTL-PANEL",
+          name: "Сенсорные панели управления",
+          qty: panels,
+          purchase: panels * 128000,
+          sale: panels * 128000 * levelMultiplier * regionMultiplier,
+          type: "required",
+          reason: "Задано вручную"
+        });
+
+        push({
+          section: "Control",
+          code: "CTL-PROG",
+          name: "Программирование и сценарии",
+          qty: rooms,
+          unit: "зон",
+          purchase: rooms * 42000,
+          sale: rooms * 42000 * levelMultiplier * regionMultiplier,
+          type: "auto",
+          reason: "Зависимость от количества зон"
+        });
+      }
+
+      if (state.systems.find((s) => s.id === "network")?.enabled) {
+        const switches = num(getField("network", "switchCount"));
+        const rack = num(getField("network", "rackUnits"));
+        const ups = getField("network", "ups") === "yes";
+
+        push({
+          section: "Network",
+          code: "NET-SW",
+          name: "Управляемые коммутаторы",
+          qty: switches,
+          purchase: switches * 94000,
+          sale: switches * 94000 * levelMultiplier * regionMultiplier,
+          type: "required",
+          reason: "Задано пользователем"
+        });
+
+        push({
+          section: "Network",
+          code: "NET-RACK",
+          name: `Шкаф телекоммуникационный ${rack}U`,
+          qty: 1,
+          purchase: rack * 8200,
+          sale: rack * 8200 * levelMultiplier * regionMultiplier,
+          type: "required",
+          reason: "Размер шкафа"
+        });
+
+        if (ups) {
+          push({
+            section: "Network",
+            code: "NET-UPS",
+            name: "UPS для AV / сети",
+            qty: 1,
+            purchase: 168000,
+            sale: 168000 * levelMultiplier * regionMultiplier,
+            type: "optional",
+            reason: "Включено пользователем"
+          });
+        }
+
+        push({
+          section: "Network",
+          code: "NET-PATCH",
+          name: "Патч-панель / патчкорды / аксессуары",
+          qty: Math.max(1, switches),
+          purchase: switches * 28000,
+          sale: switches * 28000 * levelMultiplier * regionMultiplier,
+          type: "auto",
+          reason: "Обязательная зависимость сети"
+        });
+      }
+
+      if (state.systems.find((s) => s.id === "interactive")?.enabled) {
+        const touchPoints = num(getField("interactive", "touchPoints"));
+        const size = num(getField("interactive", "size"));
+        const kiosk = getField("interactive", "kiosk");
+        const displayBase = size >= 75 ? 385000 : size >= 65 ? 290000 : size >= 55 ? 215000 : 178000;
+        const standMul = kiosk === "kiosk" ? 1.22 : 1;
+
+        push({
+          section: "Interactive",
+          code: "INT-DSP",
+          name: `Интерактивная панель ${size}"`,
+          qty: touchPoints,
+          purchase: touchPoints * displayBase,
+          sale: touchPoints * displayBase * levelMultiplier * regionMultiplier,
+          type: "required",
+          reason: "По числу точек интерактива"
+        });
+
+        push({
+          section: "Interactive",
+          code: "INT-MP",
+          name: "Медиаплеер / ПК",
+          qty: touchPoints,
+          purchase: touchPoints * 132000,
+          sale: touchPoints * 132000 * levelMultiplier * regionMultiplier,
+          type: "auto",
+          reason: "Обязательная зависимость интерактива"
+        });
+
+        push({
+          section: "Interactive",
+          code: "INT-MOUNT",
+          name: kiosk === "kiosk" ? "Стойка / корпус" : "Настенное крепление",
+          qty: touchPoints,
+          purchase: touchPoints * 46000 * standMul,
+          sale: touchPoints * 46000 * standMul * levelMultiplier * regionMultiplier,
+          type: "auto",
+          reason: "По типу установки"
+        });
+      }
+
+      if (state.systems.find((s) => s.id === "power")?.enabled) {
+        const pnrDays = num(getField("power", "pnrDays"));
+        const kits = num(getField("power", "electricKits"));
+        const sparePower = num(getField("power", "sparePower")) / 100;
+
+        push({
+          section: "Power",
+          code: "PWR-EKIT",
+          name: "Комплект электрики и автоматов",
+          qty: kits,
+          purchase: kits * 118000 * infrastructureMultiplier,
+          sale: kits * 118000 * infrastructureMultiplier * levelMultiplier * regionMultiplier,
+          type: "required",
+          reason: "По числу комплектов"
+        });
+
+        push({
+          section: "Power",
+          code: "PWR-MAT",
+          name: "Монтажные материалы и кабельный запас",
+          qty: 1,
+          purchase: Math.max(180000, p.area * 860 * (1 + sparePower)),
+          sale: Math.max(180000, p.area * 860 * (1 + sparePower)) * levelMultiplier * regionMultiplier,
+          type: "auto",
+          reason: `Запас питания ${Math.round(sparePower * 100)}%`
+        });
+
+        push({
+          section: "Power",
+          code: "PNR",
+          name: "Пусконаладочные работы",
+          qty: pnrDays,
+          unit: "дн.",
+          purchase: pnrDays * 78000 * complexityMultiplier,
+          sale: pnrDays * 78000 * complexityMultiplier * levelMultiplier * regionMultiplier,
+          type: "required",
+          reason: "По количеству дней ПНР"
+        });
+      }
+
+      const subtotalPurchase = spec.reduce((sum, row) => sum + row.purchase, 0);
+      const installCost = subtotalPurchase * 0.08 * complexityMultiplier;
+      const engineeringCost = subtotalPurchase * 0.045 * calcModeReserve;
+
+      push({
+        section: "Общие",
+        code: "GEN-INSTALL",
+        name: "Монтажные работы",
+        qty: 1,
+        purchase: installCost,
+        sale: installCost * levelMultiplier * regionMultiplier,
+        type: "required",
+        reason: "Типовой коэффициент от оборудования"
+      });
+
+      push({
+        section: "Общие",
+        code: "GEN-ENG",
+        name: "Инженерная проработка / пресейл / спецификация",
+        qty: 1,
+        purchase: engineeringCost,
+        sale: engineeringCost * levelMultiplier * regionMultiplier,
+        type: "required",
+        reason: "Норматив пресейл-проработки"
+      });
+
+      return spec;
+    }
+
+    function buildRisks(spec) {
+      const risks = [];
+      const p = state.project;
+
+      if (!p.projectName.trim()) {
+        risks.push({ text: "Не указано название проекта — выгрузка Excel будет с общим именем.", type: "err" });
+      }
+      if (p.ceiling >= 5.5) {
+        risks.push({ text: "Высокие потолки: возможно увеличение металлоконструкций, подъёмных работ и ПНР.", type: "warn" });
+      }
+      if (p.infrastructure === "none") {
+        risks.push({ text: "Инфраструктура почти отсутствует — высок риск дополнительных работ по кабельным трассам и электрике.", type: "warn" });
+      }
+      if (p.mountComplexity === "veryhard") {
+        risks.push({ text: "Очень сложный монтаж: предварительный расчёт требует подтверждения после обследования площадки.", type: "err" });
+      }
+
+      const totalSale = spec.reduce((sum, row) => sum + row.sale, 0);
+      if (p.budget > 0 && totalSale > p.budget) {
+        risks.push({ text: `Просчёт выше заданного бюджета на ${rub(totalSale - p.budget)}.`, type: "err" });
+      } else if (p.budget > 0) {
+        risks.push({ text: "Текущая конфигурация укладывается в ожидаемый бюджет.", type: "ok" });
+      }
+
+      if (!state.systems.some((s) => s.enabled)) {
+        risks.push({ text: "Не выбрано ни одной системы — спецификация будет пустой.", type: "err" });
+      }
+
+      if (p.calcMode === "express") {
+        risks.push({ text: "Экспресс-режим: точность ориентировочная, без детальной трассировки и рабочей документации.", type: "warn" });
+      }
+
+      return risks;
+    }
+
+    function buildScope() {
+      return [
+        "Включены: оборудование, обязательные зависимости, типовой монтаж, инженерная проработка, ПНР.",
+        "Не включены: строительно-отделочные работы, нестандартные трассы сверх допущений, авторский надзор, логистика вне типового сценария.",
+        "Цены ориентировочные для пресейла и подлежат уточнению после обследования, утверждения брендов и финальной РД."
+      ];
+    }
+
+    function renderSpec() {
+      const body = document.getElementById("specBody");
+      body.innerHTML = state.spec
+        .map(
+          (row) => `
+          <tr>
+            <td>${row.section}</td>
+            <td>${row.code}</td>
+            <td>${row.name}</td>
+            <td>${formatQty(row.qty)}</td>
+            <td>${row.unit}</td>
+            <td>${rub(row.purchase)}</td>
+            <td>${rub(row.sale)}</td>
+            <td>${typeTag(row.type)}</td>
+            <td>${row.reason}</td>
+          </tr>
+        `
+        )
+        .join("");
+    }
+
+    function renderSummaryHeader() {
+      document.getElementById("summaryProjectName").textContent =
+        state.project.projectName.trim() || "Без названия";
+
+      const typeText = document.getElementById("projectType").selectedOptions[0]?.text || "Проект";
+      const calcText = document.getElementById("calcMode").selectedOptions[0]?.text || "Стандарт";
+      document.getElementById("summaryMeta").textContent = `${typeText} · ${calcText} расчёт`;
+    }
+
+    function renderSummaryMetrics() {
+      const purchase = state.spec.reduce((sum, row) => sum + row.purchase, 0);
+      const sale = state.spec.reduce((sum, row) => sum + row.sale, 0);
+      const margin = sale - purchase;
+      const marginPct = sale > 0 ? (margin / sale) * 100 : 0;
+
+      document.getElementById("summaryPurchase").textContent = rub(purchase);
+      document.getElementById("summarySale").textContent = rub(sale);
+      document.getElementById("summaryMargin").textContent = rub(margin);
+      document.getElementById("summaryMarginPct").textContent = `${marginPct.toFixed(1)}%`;
+
+      document.getElementById("summaryItems").textContent = String(state.spec.length);
+      document.getElementById("summaryModules").textContent = String(state.systems.filter((s) => s.enabled).length);
+      document.getElementById("summaryAuto").textContent = String(state.spec.filter((r) => r.type === "auto").length);
+      document.getElementById("summaryRequired").textContent = String(state.spec.filter((r) => r.type === "required").length);
+    }
+
+    function renderRisks() {
+      const list = document.getElementById("riskList");
+      list.innerHTML = state.risks
+        .map((risk) => `<li class="${risk.type}">${risk.text}</li>`)
+        .join("");
+    }
+
+    function renderScope() {
+      const list = document.getElementById("scopeList");
+      list.innerHTML = state.scope.map((item) => `<li>${item}</li>`).join("");
+    }
+
+    function calculate() {
+      state.spec = buildSpec();
+      state.risks = buildRisks(state.spec);
+      state.scope = buildScope();
+
+      renderSummaryHeader();
+      renderSpec();
+      renderSummaryMetrics();
+      renderRisks();
+      renderScope();
+    }
+
+    function saveDraft() {
+      const snapshot = {
+        project: state.project,
+        systems: state.systems
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot));
+      alert("Черновик сохранён локально.");
+    }
+
+    function loadDraft() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) {
+        alert("Сохранённый черновик не найден.");
+        return;
+      }
+
+      try {
+        const parsed = JSON.parse(raw);
+        if (parsed.project) {
+          state.project = parsed.project;
+        }
+        if (parsed.systems) {
+          state.systems = parsed.systems;
+        }
+
+        applyStateToFields();
+        renderSystemToggles();
+        renderModules();
+        calculate();
+        alert("Черновик загружен.");
+      } catch (e) {
+        console.error(e);
+        alert("Не удалось загрузить черновик.");
+      }
+    }
+
+    function clearDraft() {
+      localStorage.removeItem(STORAGE_KEY);
+      alert("Локальный черновик удалён.");
+    }
+
+    function applyStateToFields() {
+      Object.entries(state.project).forEach(([key, value]) => {
+        const el = document.getElementById(key);
+        if (el) el.value = value;
+      });
+      renderSummaryHeader();
+    }
+
+    function buildExportHtml() {
+      const purchase = state.spec.reduce((sum, row) => sum + row.purchase, 0);
+      const sale = state.spec.reduce((sum, row) => sum + row.sale, 0);
+      const margin = sale - purchase;
+      const marginPct = sale > 0 ? (margin / sale) * 100 : 0;
+
+      const risksHtml = state.risks.map((r) => `<tr><td>${escapeHtml(r.text)}</td><td>${escapeHtml(r.type)}</td></tr>`).join("");
+      const scopeHtml = state.scope.map((s) => `<tr><td>${escapeHtml(s)}</td></tr>`).join("");
+      const specRows = state.spec
+        .map(
+          (row) => `
+          <tr>
+            <td>${escapeHtml(row.section)}</td>
+            <td>${escapeHtml(row.code)}</td>
+            <td>${escapeHtml(row.name)}</td>
+            <td>${row.qty}</td>
+            <td>${escapeHtml(row.unit)}</td>
+            <td>${row.purchase}</td>
+            <td>${row.sale}</td>
+            <td>${escapeHtml(row.type)}</td>
+            <td>${escapeHtml(row.reason)}</td>
+          </tr>
+        `
+        )
+        .join("");
+
+      return `
+<html xmlns:o="urn:schemas-microsoft-com:office:office"
+      xmlns:x="urn:schemas-microsoft-com:office:excel"
+      xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+<meta charset="utf-8" />
+<!--[if gte mso 9]>
+<xml>
+  <x:ExcelWorkbook>
+    <x:ExcelWorksheets>
+      <x:ExcelWorksheet>
+        <x:Name>Просчёт</x:Name>
+        <x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions>
+      </x:ExcelWorksheet>
+    </x:ExcelWorksheets>
+  </x:ExcelWorkbook>
+</xml>
+<![endif]-->
+<style>
+  body { font-family: Arial, sans-serif; }
+  table { border-collapse: collapse; width: 100%; }
+  td, th { border: 1px solid #cfcfcf; padding: 6px; vertical-align: top; }
+  th { background: #111111; color: #ffffff; }
+  .title { font-size: 18px; font-weight: bold; }
+  .green { background: #dff8e7; }
+  .section { background: #f2f2f2; font-weight: bold; }
+</style>
+</head>
+<body>
+  <table>
+    <tr><td class="title" colspan="2">VIZHU — Пресейл конфигуратор</td></tr>
+    <tr><td>Название проекта</td><td>${escapeHtml(state.project.projectName || "Без названия")}</td></tr>
+    <tr><td>Заказчик</td><td>${escapeHtml(state.project.clientName || "")}</td></tr>
+    <tr><td>Ответственный</td><td>${escapeHtml(state.project.ownerName || "")}</td></tr>
+    <tr><td>Тип объекта</td><td>${escapeHtml(document.getElementById("projectType").selectedOptions[0]?.text || "")}</td></tr>
+    <tr><td>Регион</td><td>${escapeHtml(document.getElementById("region").selectedOptions[0]?.text || "")}</td></tr>
+    <tr><td>Класс решения</td><td>${escapeHtml(document.getElementById("level").selectedOptions[0]?.text || "")}</td></tr>
+    <tr><td>Точность расчёта</td><td>${escapeHtml(document.getElementById("calcMode").selectedOptions[0]?.text || "")}</td></tr>
+    <tr><td>Площадь, м²</td><td>${state.project.area}</td></tr>
+    <tr><td>Количество зон</td><td>${state.project.zones}</td></tr>
+    <tr><td>Высота потолка, м</td><td>${state.project.ceiling}</td></tr>
+    <tr><td>Сложность монтажа</td><td>${escapeHtml(document.getElementById("mountComplexity").selectedOptions[0]?.text || "")}</td></tr>
+    <tr><td>Инфраструктура</td><td>${escapeHtml(document.getElementById("infrastructure").selectedOptions[0]?.text || "")}</td></tr>
+    <tr><td>Комментарий</td><td>${escapeHtml(state.project.projectComment || "")}</td></tr>
+  </table>
+
+  <br/>
+
+  <table>
+    <tr><th colspan="2">Итоги</th></tr>
+    <tr><td>Себестоимость</td><td>${purchase}</td></tr>
+    <tr><td>Продажа</td><td>${sale}</td></tr>
+    <tr><td>Маржа</td><td>${margin}</td></tr>
+    <tr><td>Маржинальность, %</td><td>${marginPct.toFixed(1)}</td></tr>
+  </table>
+
+  <br/>
+
+  <table>
+    <tr><th colspan="9">Спецификация</th></tr>
+    <tr>
+      <th>Раздел</th>
+      <th>Код</th>
+      <th>Наименование</th>
+      <th>Кол-во</th>
+      <th>Ед.</th>
+      <th>Закупка</th>
+      <th>Продажа</th>
+      <th>Тип</th>
+      <th>Основание</th>
+    </tr>
+    ${specRows}
+  </table>
+
+  <br/>
+
+  <table>
+    <tr><th colspan="2">Риски и флаги</th></tr>
+    ${risksHtml || '<tr><td colspan="2">Нет</td></tr>'}
+  </table>
+
+  <br/>
+
+  <table>
+    <tr><th>Что включено / не включено</th></tr>
+    ${scopeHtml}
+  </table>
+</body>
+</html>
+      `.trim();
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function exportExcel() {
+      calculate();
+
+      const html = buildExportHtml();
+      const blob = new Blob([html], {
+        type: "application/vnd.ms-excel;charset=utf-8;"
+      });
+
+      const fileName = `${sanitizeFileName(state.project.projectName || "vizhu-presale-calc")}.xls`;
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function bindActions() {
+      document.getElementById("recalcTop").addEventListener("click", calculate);
+      document.getElementById("recalcSide").addEventListener("click", calculate);
+
+      document.getElementById("saveDraftTop").addEventListener("click", saveDraft);
+      document.getElementById("saveDraftSide").addEventListener("click", saveDraft);
+
+      document.getElementById("loadDraft").addEventListener("click", loadDraft);
+      document.getElementById("clearDraft").addEventListener("click", clearDraft);
+
+      document.getElementById("exportTop").addEventListener("click", exportExcel);
+      document.getElementById("exportSpec").addEventListener("click", exportExcel);
+
+      document.getElementById("expandAll").addEventListener("click", () => {
+        document.querySelectorAll(".module").forEach((module) => module.classList.add("active"));
+        document.querySelectorAll(".toggle-module").forEach((btn) => (btn.textContent = "Свернуть"));
+      });
+
+      document.getElementById("collapseAll").addEventListener("click", () => {
+        document.querySelectorAll(".module").forEach((module) => module.classList.remove("active"));
+        document.querySelectorAll(".toggle-module").forEach((btn) => (btn.textContent = "Открыть"));
+      });
+    }
+
+    function init() {
+      renderMenu();
+      bindProjectFields();
+      renderSystemToggles();
+      renderModules();
+      bindActions();
+      calculate();
+    }
+
+    init();
+  </script>
+</body>
+</html>
